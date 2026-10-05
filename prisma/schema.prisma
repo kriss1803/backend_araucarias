@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  correo    String    @unique
+  password  String
+  rol       String    @default("Residente")
+  createdAt DateTime  @default(now())
+
+  vivienda  Vivienda?
+  reservas  Reserva[]
+  pagos     Pago[]
+}
+
+model Vivienda {
+  id          Int       @id @default(autoincrement())
+  numero      String    @unique
+  bloque      String?
+  usuarioId   Int       @unique
+
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  alicuotas   Alicuota[]
+}
+
+model Alicuota {
+  id              Int       @id @default(autoincrement())
+  periodo         String
+  monto           Decimal   @db.Decimal(10, 2)
+  fechaVencimiento DateTime
+  estado          String    @default("PENDIENTE")
+  createdAt       DateTime  @default(now())
+
+  viviendaId      Int
+  vivienda        Vivienda  @relation(fields: [viviendaId], references: [id])
+
+  pagos           Pago[]
+
+  @@index([viviendaId])
+  @@index([estado])
+}
+
+model Pago {
+  id              Int          @id @default(autoincrement())
+  monto           Decimal      @db.Decimal(10, 2)
+  fechaPago       DateTime     @default(now())
+  metodoPago      String
+  estado          String       @default("PENDIENTE")
+  observacion     String?
+  createdAt       DateTime     @default(now())
+
+  usuarioId       Int
+  alicuotaId      Int
+
+  usuario         Usuario      @relation(fields: [usuarioId], references: [id])
+  alicuota        Alicuota     @relation(fields: [alicuotaId], references: [id])
+  comprobante     Comprobante?
+
+  @@index([usuarioId])
+  @@index([alicuotaId])
+  @@index([estado])
+}
+
+model Comprobante {
+  id              Int       @id @default(autoincrement())
+  nombreArchivo   String
+  rutaArchivo     String
+  tipoArchivo     String
+  fechaSubida     DateTime  @default(now())
+
+  pagoId          Int       @unique
+  pago            Pago      @relation(fields: [pagoId], references: [id])
+}
+
+model AreaComun {
+  id         Int      @id @default(autoincrement())
+  nombre     String
+  capacidad  Int
+
+  reservas   Reserva[]
+}
+
+model Reserva {
+  id          Int       @id @default(autoincrement())
+  fecha       DateTime
+  horaInicio  String
+  horaFin     String
+  estado      String
+
+  usuarioId   Int
+  areaId      Int
+
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  areaComun   AreaComun @relation(fields: [areaId], references: [id])
+}

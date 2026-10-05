@@ -1,0 +1,15 @@
+@"
+node_modules/
+
+.env
+
+/src/generated/prisma
+
+uploads/
+*.pdf
+
+.postman/
+postman/
+
+araucarias_app/
+"@ | Set-Content .gitignore
