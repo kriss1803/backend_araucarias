@@ -1,15 +1,4 @@
-@"
-node_modules/
-
 .env
-
-/src/generated/prisma
-
-uploads/
-*.pdf
-
-.postman/
-postman/
-
+node_modules/
+prisma/dev.db
 araucarias_app/
-"@ | Set-Content .gitignoreprisma/dev.db
