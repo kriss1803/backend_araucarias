@@ -12,4 +12,4 @@ uploads/
 postman/
 
 araucarias_app/
-"@ | Set-Content .gitignore
+"@ | Set-Content .gitignoreprisma/dev.db
